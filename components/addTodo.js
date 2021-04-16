@@ -11,7 +11,7 @@ export default function AddTodo({ submitHandler }) {
   };
 
   const pressHandler = () => {
-    submitHandler(text,date);
+    submitHandler(text, date);
     setText("");
   };
 
@@ -23,8 +23,9 @@ export default function AddTodo({ submitHandler }) {
         onChangeText={changeHandler}
         value={text}
       />
-      <DatePicker clicked={setDate}>
-      </DatePicker>
+      <View style={styles.input}>
+        <DatePicker clicked={setDate}></DatePicker>
+      </View>
       <Button color="coral" onPress={pressHandler} title="add todo" />
     </View>
   );

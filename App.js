@@ -16,15 +16,9 @@ import moment from "moment";
 const toPresentFilterGenerator = (filter) => {
   if (filter === "current") {
     return (item) => {
-      console.log(item.date);
-      console.log(moment(item.date).toString());
-      console.log(moment().subtract("d", 1).toString());
-      console.log(
-        !moment(moment(item.date)).isAfter(moment().subtract("d", 1))
-      );
       return (
         item.state === "" &&
-        !moment(moment(item.date)).isAfter(moment().subtract("d", 1))
+        moment(moment(item.date)).isAfter(moment().subtract("d", 1))
       );
     };
   }
@@ -34,7 +28,7 @@ const toPresentFilterGenerator = (filter) => {
   if (filter === "late") {
     return (item) =>
       item.state === "" &&
-      moment(moment(item.date)).isAfter(moment().subtract("d", 1));
+      !moment(moment(item.date)).isAfter(moment().subtract("d", 1));
   }
 };
 
@@ -49,12 +43,18 @@ export default function App() {
     { text: "create an app", key: "2", date: moment(), state: "" },
     { text: "play on the switch", key: "3", date: moment(), state: "" },
   ]);
-  const [filter, setFilter] = useState("current");
-  const toPresentFilter = toPresentFilterGenerator(filter);
-  const toRepresentTodos = todos.filter((todo) => toPresentFilter(todo));
 
-  // const toPresent = useMemo()
+  const [filter, setFilter] = useState("current");
+  const toPresentFilter = useCallback(toPresentFilterGenerator(filter), [
+    filter,
+  ]);
+  const toRepresentTodos = useMemo(
+    () => todos.filter((todo) => toPresentFilter(todo)),
+    [filter, todos]
+  );
+
   const pressHandler = useCallback((key) => {
+    if (filter === "done") return;
     setTodos((prevTodos) => {
       return prevTodos.map((todo) => {
         if (todo.key != key) {
@@ -133,11 +133,9 @@ const styles = StyleSheet.create({
   },
   list: {
     marginTop: 20,
-    // flex: 1,
   },
   todoControllers: {
     flexDirection: "row",
-    // justifyContent: "space-between",
     justifyContent: "center",
     marginTop: 5,
   },
